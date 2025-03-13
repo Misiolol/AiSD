@@ -1,5 +1,5 @@
-#include<iostream>
-#include<vector>
+#include <iostream>
+#include <vector>
 #include <sys/time.h>
 
 using namespace std;
@@ -30,27 +30,43 @@ vector<int> randomDataVector(int size_of_vector, int max_size_of_number)
 }
 
 
-// Funkcja do wykonywania sortowania bąbelkowego
-vector<int> SortowanieBabelkowe(vector<int> &tablica)
-{
-    int rozmiar = tablica.size();
-    for (int i = 0; i < rozmiar - 1; i++)
-    {
-        // Inicjalizacja indeksu minimalnego
-        int indeksMin = i;
-        for (int j = i + 1; j < rozmiar; j++)
-        {
-            // Znalezienie minimalnego elementu w nieposortowanej części
-            if (tablica[j] < tablica[indeksMin])
-            {
-                indeksMin = j;
-            }
-        }
-        // Zamiana znalezionego minimalnego elementu z pierwszym elementem
-        swap(tablica[i], tablica[indeksMin]);
-    }
+void heapify(vector<int>& arr, int n, int i) {
+    int largest = i; // Inicjalizuj największy jako korzeń
+    int left = 2 * i + 1; // lewy = 2*i + 1
+    int right = 2 * i + 2; // prawy = 2*i + 2
 
-    return tablica;
+    // Jeśli lewy liść jest większy niż korzeń
+    if (left < n && arr[left] > arr[largest])
+        largest = left;
+
+    // Jeśli prawy liść jest większy niż największy dotychczasowy
+    if (right < n && arr[right] > arr[largest])
+        largest = right;
+
+    // Jeśli największy nie jest korzeniem
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+
+        // Rekurencyjnie heapify poddrzewo
+        heapify(arr, n, largest);
+    }
+}
+
+void heapSort(vector<int>& arr) {
+    int n = arr.size();
+
+    // Zbuduj kopiec (przekształć tablicę w kopiec)
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i);
+
+    // Jeden po drugim wyciągaj elementy z kopca
+    for (int i = n - 1; i >= 0; i--) {
+        // Przenieś bieżący korzeń na koniec
+        swap(arr[0], arr[i]);
+
+        // Wywołaj heapify na zmniejszonym kopcu
+        heapify(arr, i, 0);
+    }
 }
 
 void testArray(){
@@ -68,7 +84,7 @@ void testArray(){
         cout << arr[i] << " ";
     cout << endl;
 
-    SortowanieBabelkowe(arr);
+    heapSort(arr);
 
     cout << "After:"<<endl;
     for (int i = 0; i < arr_size; i++)
@@ -82,7 +98,6 @@ void testArray(){
     cout << elapsed << endl;
 }
 
-
 void main_task(){
     //! generating random data array
     vector<int>unsorted = randomDataVector(99999, 1000);
@@ -93,7 +108,7 @@ void main_task(){
     gettimeofday(&begin, 0);
     
     //^ sorting
-    SortowanieBabelkowe(unsorted);
+    heapSort(unsorted);
 
     //* end timer
     gettimeofday(&end, 0);
@@ -104,12 +119,13 @@ void main_task(){
     cout << elapsed << endl;
 }
 
-int main()
-{
+
+int main() {
     ios_base::sync_with_stdio(0); 
     cin.tie(0);
     cout.tie(0);
-
+    
     testArray();
     main_task();
+    return 0;
 }

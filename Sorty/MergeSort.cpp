@@ -4,41 +4,48 @@
 
 using namespace std;
 
-void merge(vector<int>& arr, int left, int mid, int right) {
-    int n1 = mid - left + 1;
-    int n2 = right - mid;
+void merge(vector<int>& arr, int lewy, int srodek, int prawy) {
+    int rozmiar_lewy = srodek - lewy + 1;
+    int rozmiar_prawy = prawy - srodek;
 
-    vector<int> L(n1), R(n2);
+    vector<int> lewa(rozmiar_lewy), prawa(rozmiar_prawy);
 
-    for (int i = 0; i < n1; ++i)
-        L[i] = arr[left + i];
-    for (int j = 0; j < n2; ++j)
-        R[j] = arr[mid + 1 + j];
+    // Kopiowanie danych do tymczasowych wektorów
+    for (int i = 0; i < rozmiar_lewy; ++i)
+        lewa[i] = arr[lewy + i];
+    for (int j = 0; j < rozmiar_prawy; ++j)
+        prawa[j] = arr[srodek + 1 + j];
 
-    int i = 0, j = 0, k = left;
-    while (i < n1 && j < n2) {
-        if (L[i] <= R[j]) {
-            arr[k] = L[i];
+    int i = 0, j = 0, k = lewy;
+
+
+    // Scalanie tymczasowych wektorów z powrotem do arr
+    while (i < rozmiar_lewy && j < rozmiar_prawy) {
+        if (lewa[i] <= prawa[j]) {
+            arr[k] = lewa[i];
             ++i;
         } else {
-            arr[k] = R[j];
+            arr[k] = prawa[j];
             ++j;
         }
         ++k;
     }
 
-    while (i < n1) {
-        arr[k] = L[i];
+    // Kopiowanie pozostałych elementów lewego wektora, jeśli są
+    while (i < rozmiar_lewy) {
+        arr[k] = lewa[i];
         ++i;
         ++k;
     }
 
-    while (j < n2) {
-        arr[k] = R[j];
+    // Kopiowanie pozostałych elementów prawego wektora, jeśli są
+    while (j < rozmiar_prawy) {
+        arr[k] = prawa[j];
         ++j;
         ++k;
     }
 }
+
 
 void mergeSort(vector<int>& arr, int left, int right) {
     if (left < right) {
