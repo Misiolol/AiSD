@@ -27,7 +27,8 @@ class AVLNode:
         self.left = None
         self.right = None
         self.up = None
-        self.bf = 0
+        self.height = 1  # Wysokość poddrzewa - ważne dla AVL
+        self.bf = 0      # Współczynnik równowagi (balance factor)
         self.pos = (0, 0)
 
 
@@ -35,64 +36,139 @@ class AVLTree:
     def __init__(self):
         self.root = None
 
+    def get_height(self, node):
+        if not node:
+            return 0
+        return node.height
+
+    def update_height_and_bf(self, node):
+        if not node:
+            return
+        left_height = self.get_height(node.left)
+        right_height = self.get_height(node.right)
+        node.height = 1 + max(left_height, right_height)
+        node.bf = left_height - right_height
+
+    def rotate_left(self, z):
+        y = z.right
+        T2 = y.left
+
+        # Perform rotation
+        y.left = z
+        z.right = T2
+
+        # Update parent references
+        if T2:
+            T2.up = z
+        y.up = z.up
+        z.up = y
+
+        # Update heights and balance factors
+        self.update_height_and_bf(z)
+        self.update_height_and_bf(y)
+
+        return y
+
+    def rotate_right(self, z):
+        y = z.left
+        T3 = y.right
+
+        # Perform rotation
+        y.right = z
+        z.left = T3
+
+        # Update parent references
+        if T3:
+            T3.up = z
+        y.up = z.up
+        z.up = y
+
+        # Update heights and balance factors
+        self.update_height_and_bf(z)
+        self.update_height_and_bf(y)
+
+        return y
+
+    def balance(self, node):
+        # Left Heavy
+        if node.bf > 1:
+            # Left-Right Case
+            if node.left.bf < 0:
+                node.left = self.rotate_left(node.left)
+            # Left-Left Case
+            return self.rotate_right(node)
+        
+        # Right Heavy
+        elif node.bf < -1:
+            # Right-Left Case
+            if node.right.bf > 0:
+                node.right = self.rotate_right(node.right)
+            # Right-Right Case
+            return self.rotate_left(node)
+        
+        # No rotation needed
+        return node
+
     def insert(self, key):
-        def update_balance(node):
-            if node.bf < -1:
-                if node.right.bf > 0:
-                    self.rotate_right(node.right)
-                return self.rotate_left(node)
-            elif node.bf > 1:
-                if node.left.bf < 0:
-                    self.rotate_left(node.left)
-                return self.rotate_right(node)
-            return node
-
-        def insert_node(root, node):
-            if not root:
-                return node
-            if node.key < root.key:
-                root.left = insert_node(root.left, node)
-                root.left.up = root
-                root.bf += 1
+        def _insert(node, key):
+            # Standard BST insert
+            if not node:
+                return AVLNode(key)
+            
+            if key < node.key:
+                node.left = _insert(node.left, key)
+                node.left.up = node
             else:
-                root.right = insert_node(root.right, node)
-                root.right.up = root
-                root.bf -= 1
-            return update_balance(root)
+                node.right = _insert(node.right, key)
+                node.right.up = node
 
-        new_node = AVLNode(key)
-        self.root = insert_node(self.root, new_node)
+            # Update height and balance factor
+            self.update_height_and_bf(node)
 
-    def rotate_left(self, A):
-        B = A.right
-        A.right = B.left
-        if B.left:
-            B.left.up = A
-        B.left = A
-        A.up = B
+            # Balance the node if needed
+            return self.balance(node)
 
-        if A == self.root:
-            self.root = B
+        self.root = _insert(self.root, key)
 
-        A.bf = A.bf + 1 - min(B.bf, 0)
-        B.bf = B.bf + 1 + max(A.bf, 0)
-        return B
+    def remove(self, key):
+        def _remove(node, key):
+            # Standard BST delete
+            if not node:
+                return node
 
-    def rotate_right(self, A):
-        B = A.left
-        A.left = B.right
-        if B.right:
-            B.right.up = A
-        B.right = A
-        B.up = A.up
-        A.up = B
+            if key < node.key:
+                node.left = _remove(node.left, key)
+            elif key > node.key:
+                node.right = _remove(node.right, key)
+            else:
+                # Node with only one child or no child
+                if not node.left:
+                    return node.right
+                elif not node.right:
+                    return node.left
 
-        if A == self.root:
-            self.root = B
+                # Node with two children: get inorder successor
+                temp = self.get_min_node(node.right)
+                node.key = temp.key
+                node.right = _remove(node.right, temp.key)
 
-        A.bf = A.bf - 1 - max(B.bf, 0)
-        B.bf = B.bf - 1 + min(A.bf, 0)
-        return B
+            # If the tree had only one node then return
+            if not node:
+                return node
+
+            # Update height and balance factor
+            self.update_height_and_bf(node)
+
+            # Balance the node if needed
+            return self.balance(node)
+
+        self.root = _remove(self.root, key)
+
+    def get_min_node(self, node):
+        current = node
+        while current.left:
+            current = current.left
+        return current
 
     def get_tree_depth(self, node):
         if not node:
@@ -103,68 +179,68 @@ class AVLTree:
 
     def get_nodes_positions(self):
         levels = {}
-
         window_width, window_height = screen.get_size()
         max_depth = self.get_tree_depth(self.root)
 
-        # Check if the tree is empty
         if max_depth == 0:
-            return levels  # Return empty levels if the tree is empty
+            return levels
 
-        # Reduce horizontal spacing even further (less wide)
-        horizontal_spacing = (window_width - 100) // (max_depth * 3)  # Reduce further by changing factor
+        # Zmniejszamy przestrzeń poziomą - używamy mniejszego mnożnika
+        horizontal_spacing = (window_width - 100) // (max_depth*10)
         vertical_spacing = (window_height - 100) // (max_depth + 1)
 
-        def dfs(node, depth, x):
-            if not node:
-                return x
-            x = dfs(node.left, depth + 1, x)
-            # Adjust node positioning dynamically with reduced width
-            node.pos = (x * horizontal_spacing + 100, depth * vertical_spacing + 50)
-            if depth not in levels:
-                levels[depth] = []
-            levels[depth].append(node)
-            x += 1
-            x = dfs(node.right, depth + 1, x)
-            return x
+        # Używamy kolejki do poziomowego przechodzenia (BFS)
+        queue = deque()
+        if self.root:
+            # Początkowy zakres dla korzenia
+            left = 0
+            right = 2 ** max_depth - 1
+            x = (left + right) // 2
+            self.root.pos = (x * horizontal_spacing + 50, 50)
+            levels[0] = [self.root]
+            queue.append((self.root, 0, left, right))
 
-        dfs(self.root, 0, 0)
+        while queue:
+            node, depth, left, right = queue.popleft()
+            next_depth = depth + 1
+            
+            if node.left:
+                # Lewe dziecko - bierzemy lewą połowę zakresu rodzica
+                new_left = left
+                new_right = (left + right) // 2
+                x = (new_left + new_right) // 2
+                node.left.pos = (x * horizontal_spacing + 50, next_depth * vertical_spacing + 50)
+                
+                if next_depth not in levels:
+                    levels[next_depth] = []
+                levels[next_depth].append(node.left)
+                queue.append((node.left, next_depth, new_left, new_right))
+
+            if node.right:
+                # Prawe dziecko - bierzemy prawą połowę zakresu rodzica
+                new_left = (left + right) // 2 + 1
+                new_right = right
+                x = (new_left + new_right) // 2
+                node.right.pos = (x * horizontal_spacing + 50, next_depth * vertical_spacing + 50)
+                
+                if next_depth not in levels:
+                    levels[next_depth] = []
+                levels[next_depth].append(node.right)
+                queue.append((node.right, next_depth, new_left, new_right))
+
         return levels
 
     def remove_all_post_order(self):
-        def post_order_traversal(node):
-            if node:
-                yield from post_order_traversal(node.left)
-                yield from post_order_traversal(node.right)
-                yield node  # Yield the node before deletion
-                self.remove(node.key)
+        # First collect all nodes in post-order
+        nodes_to_delete = list(self.post_order_traversal())
+        # Then delete them one by one
+        for node in nodes_to_delete:
+            yield node
+            self.remove(node.key)
 
-        return post_order_traversal(self.root)
-
-    def remove(self, key):
-        def delete_node(node, key):
-            if not node:
-                return node
-            elif key < node.key:
-                node.left = delete_node(node.left, key)
-            elif key > node.key:
-                node.right = delete_node(node.right, key)
-            else:
-                if not node.left:
-                    return node.right
-                elif not node.right:
-                    return node.left
-
-                min_larger_node = node.right
-                while min_larger_node.left:
-                    min_larger_node = min_larger_node.left
-
-                node.key = min_larger_node.key
-                node.right = delete_node(node.right, min_larger_node.key)
-
-            return node
-
-        self.root = delete_node(self.root, key)
+    def remove_multiple(self, keys):
+        for key in keys:
+            self.remove(key)
 
     def in_order_traversal(self):
         def traverse(node):
@@ -200,7 +276,7 @@ class AVLTree:
         current = self.root
         while current:
             path.append(current)
-            current = current.left  # Min value is always on the leftmost path
+            current = current.left
         return path
 
     def find_max_path(self):
@@ -208,13 +284,9 @@ class AVLTree:
         current = self.root
         while current:
             path.append(current)
-            current = current.right  # Max value is always on the rightmost path
+            current = current.right
         return path
 
-    def remove_multiple(self, keys):
-        for key in keys:
-            self.remove(key)
-            
     def find_path(self, key):
         path = []
         current = self.root
@@ -226,8 +298,8 @@ class AVLTree:
                 current = current.left
             else:
                 current = current.right
-        return None  # Key not found
-    
+        return None
+
     def find_node(self, key):
         current = self.root
         while current:
@@ -237,7 +309,7 @@ class AVLTree:
                 current = current.left
             else:
                 current = current.right
-        return None  # Key not found
+        return None
 
 
 def draw_tree(tree, highlight_nodes=[], path_nodes=[], deleting_nodes=[]):
@@ -246,10 +318,16 @@ def draw_tree(tree, highlight_nodes=[], path_nodes=[], deleting_nodes=[]):
 
     def draw_node(node, color=BLACK):
         pygame.draw.circle(screen, color, node.pos, NODE_RADIUS)
+        # Draw key
         text_color = WHITE if color not in [YELLOW, PURPLE] else BLACK
-        text = FONT.render(str(node.key), True, text_color)
-        text_rect = text.get_rect(center=node.pos)
-        screen.blit(text, text_rect)
+        key_text = FONT.render(str(node.key), True, text_color)
+        key_rect = key_text.get_rect(center=(node.pos[0], node.pos[1] - 5))
+        screen.blit(key_text, key_rect)
+        
+        # Draw balance factor below the key in RED
+        bf_text = FONT.render(f"bf:{node.bf}", True, RED)
+        bf_rect = bf_text.get_rect(center=(node.pos[0], node.pos[1] + 15))
+        screen.blit(bf_text, bf_rect)
 
     for level in levels.values():
         for node in level:
@@ -264,7 +342,7 @@ def draw_tree(tree, highlight_nodes=[], path_nodes=[], deleting_nodes=[]):
 
     # Then draw path nodes (in yellow)
     for node in path_nodes:
-        if node not in deleting_nodes:  # Don't overwrite deleting nodes
+        if node not in deleting_nodes:
             draw_node(node, YELLOW)
 
     # Then draw highlighted nodes (in green)
@@ -323,7 +401,6 @@ def main():
     traversal_delay = 500
 
     while True:
-        # Determine which nodes to highlight based on current mode
         highlight_nodes = []
         if current_mode == "in_order":
             highlight_nodes = in_order_nodes
@@ -336,14 +413,12 @@ def main():
             
         draw_tree(tree, highlight_nodes, search_path, deleting_nodes)
         
-        # Draw buttons
         for name, rect in buttons.items():
             pygame.draw.rect(screen, BLUE, rect)
             label = name.replace("_", " ").title()
             txt = FONT.render(label, True, WHITE)
             screen.blit(txt, txt.get_rect(center=rect.center))
 
-        # Draw input box if active
         if input_active:
             input_rect = pygame.Rect(50, HEIGHT - 120, 300, 30)
             pygame.draw.rect(screen, WHITE, input_rect)
@@ -351,7 +426,6 @@ def main():
             txt_surface = FONT.render(input_text, True, BLACK)
             screen.blit(txt_surface, (input_rect.x + 5, input_rect.y + 5))
             
-            # Draw instruction text
             if current_mode == "search":
                 instr_text = "Enter key to search:"
             elif current_mode == "delete":
@@ -366,7 +440,6 @@ def main():
 
         pygame.display.flip()
 
-        # Handle traversals
         if in_order_iter is not None:
             try:
                 node = next(in_order_iter)
@@ -398,7 +471,6 @@ def main():
             try:
                 node = next(delete_all_iter)
                 deleting_nodes = [node]
-                print(f"Deleting node: {node.key}")  # Print before deletion
                 pygame.time.wait(traversal_delay)
             except StopIteration:
                 delete_all_iter = None
@@ -489,7 +561,7 @@ def main():
                     subtree_pre_order_nodes = []
                     current_mode = "post_order"
                 elif buttons["delete_all"].collidepoint(pos):
-                    delete_all_iter = iter(tree.remove_all_post_order())
+                    delete_all_iter = tree.remove_all_post_order()
                     min_path = max_path = []
                     in_order_nodes = pre_order_nodes = post_order_nodes = []
                     search_path = []
