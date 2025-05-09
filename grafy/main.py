@@ -1,6 +1,3 @@
-"""
-Główny moduł programu do sortowania topologicznego grafów.
-"""
 import argparse
 
 from graph_representations import (
@@ -14,7 +11,6 @@ from file_handler import read_graph_from_file
 
 
 def print_matrix(matrix):
-    """Wypisuje macierz w czytelnym formacie"""
     for row in matrix:
         print(" ".join(f"{cell:4}" for cell in row))
 
@@ -29,7 +25,6 @@ def main():
     
     args = parser.parse_args()
     
-    # Wczytujemy graf z pliku
     num_vertices, edges = read_graph_from_file(args.file)
     if num_vertices is None or edges is None:
         return
@@ -41,10 +36,8 @@ def main():
         for edge in edges:
             print(f"{edge[0]} -> {edge[1]}")
     
-    # Tworzymy odpowiednie reprezentacje grafu
     adj_list = create_adjacency_list(edges, num_vertices)
     
-    # Wybieramy i uruchamiamy odpowiedni algorytm
     result = None
     
     if args.algorithm == 'dfs_adj':
@@ -87,7 +80,6 @@ def main():
         
         result = kahn_graph_matrix(graph_matrix)
     
-    # Wyświetlamy wynik
     if result is not None:
         print("\nPorządek topologiczny:")
         print(" -> ".join(map(str, result)))

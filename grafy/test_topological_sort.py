@@ -1,7 +1,3 @@
-"""
-Program testujący poprawione algorytmy sortowania topologicznego.
-"""
-
 import sys
 import os
 from file_handler import read_graph_from_file
@@ -11,27 +7,18 @@ from graph_representations import (
     create_graph_matrix
 )
 
-# Importujemy poprawione wersje algorytmów
 sys.path.insert(0, os.path.abspath('.'))
 from topological_sort_dfs import dfs_adj_matrix, dfs_graph_matrix
 from topological_sort_kahn import kahn_adj_matrix, kahn_graph_matrix
 
 def print_matrix(matrix):
-    """Wypisuje macierz w czytelnym formacie"""
     for row in matrix:
         print(" ".join(f"{cell:4}" for cell in row))
 
 def test_graph(filename):
-    """
-    Testuje algorytmy sortowania topologicznego dla podanego pliku.
-    
-    Args:
-        filename: Nazwa pliku z danymi grafu
-    """
     print(f"\nTestowanie grafu z pliku: {filename}")
     print("=" * 50)
     
-    # Wczytujemy graf z pliku
     num_vertices, edges = read_graph_from_file(filename)
     if num_vertices is None or edges is None:
         return
@@ -42,7 +29,6 @@ def test_graph(filename):
     for edge in edges:
         print(f"{edge[0]} -> {edge[1]}")
     
-    # Tworzymy reprezentacje grafu
     adj_list = create_adjacency_list(edges, num_vertices)
     adj_matrix = create_adjacency_matrix(edges, num_vertices)
     graph_matrix = create_graph_matrix(adj_list)
@@ -53,7 +39,6 @@ def test_graph(filename):
     print("\nMacierz grafu:")
     print_matrix(graph_matrix)
     
-    # Testujemy algorytm DFS na macierzy sąsiedztwa
     print("\nSortowanie topologiczne metodą DFS na macierzy sąsiedztwa:")
     result_dfs_adj = dfs_adj_matrix(adj_matrix)
     if result_dfs_adj:
@@ -61,7 +46,6 @@ def test_graph(filename):
     else:
         print("Nie udało się znaleźć porządku topologicznego.")
     
-    # Testujemy algorytm DFS na macierzy grafu
     print("\nSortowanie topologiczne metodą DFS na macierzy grafu:")
     result_dfs_graph = dfs_graph_matrix(graph_matrix)
     if result_dfs_graph:
@@ -69,7 +53,6 @@ def test_graph(filename):
     else:
         print("Nie udało się znaleźć porządku topologicznego.")
     
-    # Testujemy algorytm Kahna na macierzy sąsiedztwa
     print("\nSortowanie topologiczne algorytmem Kahna na macierzy sąsiedztwa:")
     result_kahn_adj = kahn_adj_matrix(adj_matrix)
     if result_kahn_adj:
@@ -77,7 +60,6 @@ def test_graph(filename):
     else:
         print("Nie udało się znaleźć porządku topologicznego.")
     
-    # Testujemy algorytm Kahna na macierzy grafu
     print("\nSortowanie topologiczne algorytmem Kahna na macierzy grafu:")
     result_kahn_graph = kahn_graph_matrix(graph_matrix)
     if result_kahn_graph:
@@ -88,6 +70,5 @@ def test_graph(filename):
     print("=" * 50)
 
 if __name__ == "__main__":
-    # Testujemy oba przykładowe grafy
     test_graph("example_graph.txt")
     test_graph("example_cyclic_graph.txt")
