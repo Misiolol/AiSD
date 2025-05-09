@@ -4,9 +4,9 @@
 
 using namespace std;
 
-//! super visualizer 
-//* https://www.hackerearth.com/practice/algorithms/sorting/selection-sort/visualize/
 
+int swp = 0;
+int ctr = 0;
 
 // Funkcja do wypisywania wektora
 void WypiszWektor(vector<int> &wektor)
@@ -41,12 +41,14 @@ void selectionSort(vector<int>& arr)
         int minIndex = i;
         for (int j = i + 1; j < n; j++) 
         {
+            ctr++;
             if (arr[j] < arr[minIndex]) 
             {
                 minIndex = j;
             }
         }
         swap(arr[i], arr[minIndex]);
+        swp++;
     }
 }
 

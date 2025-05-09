@@ -4,6 +4,9 @@
 
 using namespace std;
 
+int ctr = 0;
+int swp = 0;
+
 // Funkcja do wypisywania wektora
 void WypiszWektor(vector<int> &wektor)
 {
@@ -18,12 +21,11 @@ void WypiszWektor(vector<int> &wektor)
 // Procedura losujaca dane
 vector<int> randomDataVector(int size_of_vector, int max_size_of_number)
 {
-    vector<int>data;
-    for(int i = 0; i<size_of_vector; i++)
+    vector<int> data;
+    srand(time(0)); // Seed the random number generator once
+    for (int i = 0; i < size_of_vector; i++)
     {
-        srand(time(0));
-        int k = rand();
-        k %=  max_size_of_number;
+        int k = rand() % max_size_of_number;
         data.push_back(k);
     }
     return data;
@@ -41,6 +43,7 @@ vector<int> SortowanieBabelkowe(vector<int> &tablica)
         for (int j = i + 1; j < rozmiar; j++)
         {
             // Znalezienie minimalnego elementu w nieposortowanej części
+            ctr++;
             if (tablica[j] < tablica[indeksMin])
             {
                 indeksMin = j;
@@ -48,6 +51,7 @@ vector<int> SortowanieBabelkowe(vector<int> &tablica)
         }
         // Zamiana znalezionego minimalnego elementu z pierwszym elementem
         swap(tablica[i], tablica[indeksMin]);
+        swp++;
     }
 
     return tablica;
@@ -111,5 +115,9 @@ int main()
     cout.tie(0);
 
     testArray();
-    main_task();
+    cout << ctr;
+    cout << endl;
+    cout << swp;
+    cout << endl;
+    //main_task();
 }

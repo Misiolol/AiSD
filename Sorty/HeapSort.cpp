@@ -4,6 +4,10 @@
 
 using namespace std;
 
+int ctr = 0;
+int swp = 0;
+
+
 // Funkcja do wypisywania wektora
 void WypiszWektor(vector<int> &wektor)
 {
@@ -18,12 +22,11 @@ void WypiszWektor(vector<int> &wektor)
 // Procedura losujaca dane
 vector<int> randomDataVector(int size_of_vector, int max_size_of_number)
 {
-    vector<int>data;
-    for(int i = 0; i<size_of_vector; i++)
+    vector<int> data;
+    srand(time(0)); // Seed the random number generator once
+    for (int i = 0; i < size_of_vector; i++)
     {
-        srand(time(0));
-        int k = rand();
-        k %=  max_size_of_number;
+        int k = rand() % max_size_of_number;
         data.push_back(k);
     }
     return data;
@@ -36,17 +39,20 @@ void heapify(vector<int>& arr, int n, int i) {
     int right = 2 * i + 2; // prawy = 2*i + 2
 
     // Jeśli lewy liść jest większy niż korzeń
+    ctr+=2;
     if (left < n && arr[left] > arr[largest])
         largest = left;
 
     // Jeśli prawy liść jest większy niż największy dotychczasowy
+    ctr+=2;    
     if (right < n && arr[right] > arr[largest])
         largest = right;
 
     // Jeśli największy nie jest korzeniem
+    ctr++;
     if (largest != i) {
         swap(arr[i], arr[largest]);
-
+        swp++;
         // Rekurencyjnie heapify poddrzewo
         heapify(arr, n, largest);
     }
@@ -63,6 +69,7 @@ void heapSort(vector<int>& arr) {
     for (int i = n - 1; i >= 0; i--) {
         // Przenieś bieżący korzeń na koniec
         swap(arr[0], arr[i]);
+        swp++;
 
         // Wywołaj heapify na zmniejszonym kopcu
         heapify(arr, i, 0);
@@ -126,6 +133,10 @@ int main() {
     cout.tie(0);
     
     testArray();
-    main_task();
+    cout << ctr;
+    cout << endl;
+    cout << swp;
+    cout << endl;
+    //main_task();
     return 0;
 }

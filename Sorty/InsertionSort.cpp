@@ -19,12 +19,11 @@ void WypiszWektor(vector<int> &wektor)
 // Procedura losujaca dane
 vector<int> randomDataVector(int size_of_vector, int max_size_of_number)
 {
-    vector<int>data;
-    for(int i = 0; i<size_of_vector; i++)
+    vector<int> data;
+    srand(time(0)); // Seed the random number generator once
+    for (int i = 0; i < size_of_vector; i++)
     {
-        srand(time(0));
-        int k = rand();
-        k %=  max_size_of_number;
+        int k = rand() % max_size_of_number;
         data.push_back(k);
     }
     return data;
@@ -32,16 +31,25 @@ vector<int> randomDataVector(int size_of_vector, int max_size_of_number)
 
 
 void insertionSort(vector<int>& tablica) {
+    int ctr = 0;
+    int swp = 0;
+    
     int rozmiar = tablica.size();
     for (int i = 1; i < rozmiar; ++i) {
         int klucz = tablica[i];
         int j = i - 1;
         while (j >= 0 && tablica[j] > klucz) {
+            ctr+=2;
             tablica[j + 1] = tablica[j];
-            --j;
+            swp++;
+            j--;
         }
         tablica[j + 1] = klucz;
     }
+
+    
+    cout << ctr << endl;
+    cout << swp << endl;
 }
 
 
@@ -76,7 +84,9 @@ void testArray(){
 
 void main_task(){
     //! generating random data array
-    vector<int>unsorted = randomDataVector(9999999, 1000);
+    vector<int>unsorted = randomDataVector(1000, 1000);
+
+    //WypiszWektor(unsorted);
     
 
     //* start timer 
@@ -100,8 +110,11 @@ int main() {
     cin.tie(0);
     cout.tie(0);
     
-    
     testArray();
+
+
     main_task();
+
+
     return 0;
 }

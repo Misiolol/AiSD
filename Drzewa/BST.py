@@ -181,7 +181,6 @@ class BSTree:
                 stack.append(node.left)
         print()
 
-    # ... (rest of the BSTree methods remain the same)
     def get_min_node(self, node):
         current = node
         while current.left:
@@ -600,7 +599,7 @@ def main():
                 elif event.unicode.isdigit() or event.unicode == ',':
                     input_text += event.unicode
 
-        clock.tick(30)
+        clock.tick(60)
 
 if __name__ == '__main__':
     main()

@@ -13,9 +13,9 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)  # Color for highlighting nodes
-YELLOW = (255, 255, 0)  # Color for path highlighting
-PURPLE = (128, 0, 128)  # Color for deletion highlighting
+GREEN = (0, 255, 0)  
+YELLOW = (255, 255, 0)  
+PURPLE = (128, 0, 128)  
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("AVL Tree Visualizer")
@@ -27,8 +27,8 @@ class AVLNode:
         self.left = None
         self.right = None
         self.up = None
-        self.height = 1  # Wysokość poddrzewa - ważne dla AVL
-        self.bf = 0      # Współczynnik równowagi (balance factor)
+        self.height = 1 
+        self.bf = 0     #balance Factor
         self.pos = (0, 0)
 
 
@@ -53,17 +53,15 @@ class AVLTree:
         y = z.right
         T2 = y.left
 
-        # Perform rotation
         y.left = z
         z.right = T2
 
-        # Update parent references
+
         if T2:
             T2.up = z
         y.up = z.up
         z.up = y
 
-        # Update heights and balance factors
         self.update_height_and_bf(z)
         self.update_height_and_bf(y)
 
@@ -73,17 +71,14 @@ class AVLTree:
         y = z.left
         T3 = y.right
 
-        # Perform rotation
         y.right = z
         z.left = T3
 
-        # Update parent references
         if T3:
             T3.up = z
         y.up = z.up
         z.up = y
 
-        # Update heights and balance factors
         self.update_height_and_bf(z)
         self.update_height_and_bf(y)
 
@@ -105,8 +100,7 @@ class AVLTree:
                 node.right = self.rotate_right(node.right)
             # Right-Right Case
             return self.rotate_left(node)
-        
-        # No rotation needed
+
         return node
 
     def insert(self, key):
@@ -192,7 +186,6 @@ class AVLTree:
         # Używamy kolejki do poziomowego przechodzenia (BFS)
         queue = deque()
         if self.root:
-            # Początkowy zakres dla korzenia
             left = 0
             right = 2 ** max_depth - 1
             x = (left + right) // 2
@@ -444,6 +437,7 @@ def main():
             try:
                 node = next(in_order_iter)
                 in_order_nodes = [node]
+                print(f"In-order traversal: Currently visiting node with key {node.key}")
                 pygame.time.wait(traversal_delay)
             except StopIteration:
                 in_order_iter = None
@@ -453,6 +447,7 @@ def main():
             try:
                 node = next(pre_order_iter)
                 pre_order_nodes = [node]
+                print(f"Pre-order traversal: Currently visiting node with key {node.key}")
                 pygame.time.wait(traversal_delay)
             except StopIteration:
                 pre_order_iter = None
@@ -462,6 +457,7 @@ def main():
             try:
                 node = next(post_order_iter)
                 post_order_nodes = [node]
+                print(f"Post-order traversal: Currently visiting node with key {node.key}")
                 pygame.time.wait(traversal_delay)
             except StopIteration:
                 post_order_iter = None
@@ -480,6 +476,7 @@ def main():
             try:
                 node = next(subtree_pre_order_iter)
                 subtree_pre_order_nodes = [node]
+                print(f"Subtree pre-order traversal: Currently visiting node with key {node.key}")
                 pygame.time.wait(traversal_delay)
             except StopIteration:
                 subtree_pre_order_iter = None
