@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
-#include <sys/time.h>
+#include<fstream>
+
 
 using namespace std;
 
@@ -19,6 +20,7 @@ void WypiszWektor(vector<int> &wektor)
 }
 
 // Procedura losujaca dane
+<<<<<<< HEAD
 vector<int> randomDataVector(int size_of_vector, int max_size_of_number)
 {
     vector<int> data;
@@ -27,15 +29,54 @@ vector<int> randomDataVector(int size_of_vector, int max_size_of_number)
     {
         int k = rand() % max_size_of_number;
         data.push_back(k);
+=======
+vector<int> generateRandomVector(int size, int maxValue) {
+    vector<int> randomVector;
+    randomVector.reserve(size); // Rezerwujemy miejsce na elementy
+
+    // Inicjalizujemy generator liczb losowych
+    srand(static_cast<unsigned int>(time(0))); 
+
+    // Wypełniamy vector losowymi liczbami
+    for (int i = 0; i < size; ++i) {
+        randomVector.push_back(std::rand() % (maxValue + 1)); // Losujemy liczbę od 0 do maxValue
+>>>>>>> 9fc17a9b7609fba609684a798ab7b27ae1302df7
     }
-    return data;
+
+   
+
+    return randomVector;
 }
 
 
-// Funkcja do wykonywania sortowania bąbelkowego
+void zapiszDoPliku(int liczbaPorownan, int liczbaZamian)
+{
+    // Otwieramy plik w trybie dopisywania (ios::app)
+    ofstream plik("statystyki_sortowania.txt", ios::app);
+    
+    // Sprawdzamy, czy plik został otwarty poprawnie
+    if (!plik.is_open())
+    {
+        cout << "Nie można otworzyć pliku!" << endl;
+        return;
+    }
+
+    // Zapisujemy liczby porównań i zamian
+    plik << "Liczba porównań: " << liczbaPorownan << endl;
+    plik << "Liczba zamian: " << liczbaZamian << endl;
+    
+    // Zamykamy plik
+    plik.close();
+}
+
+
+
 vector<int> SortowanieBabelkowe(vector<int> &tablica)
 {
     int rozmiar = tablica.size();
+    int liczbaPorownan = 0;  // Liczba porównań
+    int liczbaZamian = 0;    // Liczba zamian
+
     for (int i = 0; i < rozmiar - 1; i++)
     {
         // Inicjalizacja indeksu minimalnego
@@ -43,16 +84,30 @@ vector<int> SortowanieBabelkowe(vector<int> &tablica)
         for (int j = i + 1; j < rozmiar; j++)
         {
             // Znalezienie minimalnego elementu w nieposortowanej części
+<<<<<<< HEAD
             ctr++;
+=======
+            liczbaPorownan++;  // Zwiększamy liczbę porównań
+>>>>>>> 9fc17a9b7609fba609684a798ab7b27ae1302df7
             if (tablica[j] < tablica[indeksMin])
             {
                 indeksMin = j;
             }
         }
         // Zamiana znalezionego minimalnego elementu z pierwszym elementem
+<<<<<<< HEAD
         swap(tablica[i], tablica[indeksMin]);
         swp++;
+=======
+        if (indeksMin != i) {
+            swap(tablica[i], tablica[indeksMin]);
+            liczbaZamian++;  // Zwiększamy liczbę zamian
+        }
+>>>>>>> 9fc17a9b7609fba609684a798ab7b27ae1302df7
     }
+
+    // Po zakończeniu sortowania zapisujemy statystyki do pliku
+    zapiszDoPliku(liczbaPorownan, liczbaZamian);
 
     return tablica;
 }
@@ -60,8 +115,7 @@ vector<int> SortowanieBabelkowe(vector<int> &tablica)
 void testArray(){
     //~ Testing purposes -> 10 number array
 
-    struct timeval begin, end;
-    gettimeofday(&begin, 0);
+
 
 
     vector<int> arr = {12, 11, 13, 5, 6, 7, 4, 6, 2, 9, 43};
@@ -79,37 +133,26 @@ void testArray(){
         cout << arr[i] << " ";
     cout << endl;
 
-    gettimeofday(&end, 0);
-    long seconds = end.tv_sec - begin.tv_sec;
-    long microseconds = end.tv_usec - begin.tv_usec;
-    double elapsed = seconds + microseconds*1e-6;
-    cout << elapsed << endl;
 }
 
 
-void main_task(){
+void main_task(int a){
     //! generating random data array
-    vector<int>unsorted = randomDataVector(99999, 1000);
+    vector<int>unsorted = generateRandomVector(a, a*10);
     
+    for(int i = 0; i < unsorted.size(); i++)
+    {
+        cout << unsorted[i] << " ";
+    }
 
-    //* start timer 
-    struct timeval begin, end;
-    gettimeofday(&begin, 0);
-    
-    //^ sorting
     SortowanieBabelkowe(unsorted);
 
-    //* end timer
-    gettimeofday(&end, 0);
-    long seconds = end.tv_sec - begin.tv_sec;
-    long microseconds = end.tv_usec - begin.tv_usec;
-    double elapsed = seconds + microseconds*1e-6;
-    
-    cout << elapsed << endl;
+
 }
 
 int main()
 {
+<<<<<<< HEAD
     ios_base::sync_with_stdio(0); 
     cin.tie(0);
     cout.tie(0);
@@ -120,4 +163,17 @@ int main()
     cout << swp;
     cout << endl;
     //main_task();
+=======
+    main_task(10);
+    main_task(100);
+    main_task(400);
+    main_task(800);
+    main_task(1000);
+    main_task(4000);
+    main_task(8000);
+    main_task(10000);
+    main_task(40000);
+    main_task(80000);
+    main_task(100000);
+>>>>>>> 9fc17a9b7609fba609684a798ab7b27ae1302df7
 }

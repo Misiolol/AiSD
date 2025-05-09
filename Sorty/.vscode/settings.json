@@ -18,5 +18,8 @@
         "titleBar.inactiveBackground": "#b297d399",
         "titleBar.inactiveForeground": "#15202b99"
     },
-    "peacock.color": "#b297d3"
+    "peacock.color": "#b297d3",
+    "files.associations": {
+        "vector": "cpp"
+    }
 }

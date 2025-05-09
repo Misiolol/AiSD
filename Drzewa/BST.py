@@ -108,7 +108,7 @@ class BSTree:
         for _ in range(count):
             child = current.right
             if child:
-                yield current  # Yield current node for animation
+                yield current  
                 self.rotate_left(current)
                 current = child.right
             else:
@@ -235,7 +235,7 @@ class BSTree:
             if node:
                 yield from post_order_delete(node.left)
                 yield from post_order_delete(node.right)
-                print(f"POST-ORDER DELETION: Removing node {node.key}")
+                print(f"POST-ORDER USUWANIE: KASOWANA: {node.key}")
                 yield node
                 self.remove(node.key)
 
@@ -256,7 +256,7 @@ class BSTree:
         def traverse(node):
             if node:
                 yield from traverse(node.left)
-                print(f"IN-ORDER TRAVERSAL: Visiting node {node.key}")
+                print(f"IN-ORDER: Node {node.key}")
                 yield node
                 yield from traverse(node.right)
 
@@ -265,7 +265,7 @@ class BSTree:
     def pre_order_traversal(self, start_node=None):
         def traverse(node):
             if node:
-                print(f"PRE-ORDER TRAVERSAL: Visiting node {node.key}")
+                print(f"PRE-ORDER: Node {node.key}")
                 yield node
                 yield from traverse(node.left)
                 yield from traverse(node.right)
@@ -279,7 +279,7 @@ class BSTree:
             if node:
                 yield from traverse(node.left)
                 yield from traverse(node.right)
-                print(f"POST-ORDER TRAVERSAL: Visiting node {node.key}")
+                print(f"POST-ORDER: Node {node.key}")
                 yield node
 
         return traverse(self.root)
@@ -290,7 +290,7 @@ class BSTree:
         while current:
             path.append(current)
             current = current.left
-        print("MIN PATH:", " -> ".join(str(node.key) for node in path))
+        print("MIN SCIEZKA:", " -> ".join(str(node.key) for node in path))
         return path
 
     def find_max_path(self):
@@ -299,7 +299,7 @@ class BSTree:
         while current:
             path.append(current)
             current = current.right
-        print("MAX PATH:", " -> ".join(str(node.key) for node in path))
+        print("MAX SCIEZKA:", " -> ".join(str(node.key) for node in path))
         return path
 
     def find_path(self, key):
