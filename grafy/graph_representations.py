@@ -36,66 +36,58 @@ def create_graph_matrix(adj_list):
     predecessors = {i+1: [] for i in range(num_vertices)}
     non_incident = {i+1: [] for i in range(num_vertices)}
     cycles = {i+1: [] for i in range(num_vertices)}
+    
+    # Wypełnij następniki
     for vertex, neighbors in adj_list.items():
         successors[vertex] = neighbors.copy()
-    for vertex, neighbors in adj_list.items():
+        
+        # Wypełnij poprzedniki
         for neighbor in neighbors:
             predecessors[neighbor].append(vertex)
-    cycles_to_process = {}
+    
+    # Znajdź cykle
     for vertex, neighbors in adj_list.items():
+        # Pętle (vertex -> vertex)
         if vertex in neighbors:
-            count = neighbors.count(vertex)
-            for _ in range(count):
-                if vertex not in cycles[vertex]:
-                    cycles[vertex].append(vertex)
-            if vertex not in cycles_to_process:
-                cycles_to_process[vertex] = {}
-            cycles_to_process[vertex][vertex] = count
+            cycles[vertex].append(vertex)
+            successors[vertex].remove(vertex)
+            
+        # Cykle dwuelementowe (vertex -> neighbor -> vertex)
         for neighbor in neighbors:
-            if vertex in adj_list.get(neighbor, []) and vertex != neighbor:
-                count_v_to_n = neighbors.count(neighbor)
-                count_n_to_v = adj_list[neighbor].count(vertex)
-                min_count = min(count_v_to_n, count_n_to_v)
-                for _ in range(min_count):
-                    if neighbor not in cycles[vertex]:
-                        cycles[vertex].append(neighbor)
-                if vertex not in cycles_to_process:
-                    cycles_to_process[vertex] = {}
-                cycles_to_process[vertex][neighbor] = min_count
-    for v1, neighbors in cycles_to_process.items():
-        for v2, count in neighbors.items():
-            for _ in range(count):
-                if v2 in successors[v1]:
-                    successors[v1].remove(v2)
-                if v1 in predecessors[v2]:
-                    predecessors[v2].remove(v1)
-                if v1 != v2:
-                    if v1 in successors[v2]:
-                        successors[v2].remove(v1)
-                    if v2 in predecessors[v1]:
-                        predecessors[v1].remove(v2)
+            if neighbor != vertex and vertex in adj_list.get(neighbor, []):
+                if neighbor not in cycles[vertex]:
+                    cycles[vertex].append(neighbor)
+                if vertex in successors[vertex] and neighbor in successors[vertex]:
+                    successors[vertex].remove(neighbor)
+                if vertex in predecessors[neighbor]:
+                    predecessors[neighbor].remove(vertex)
+    
+    # Znajdź wierzchołki niepołączone
     for v1 in range(1, num_vertices + 1):
         for v2 in range(1, num_vertices + 1):
             if v2 not in successors[v1] and v1 not in successors[v2] and v2 not in cycles[v1]:
                 non_incident[v1].append(v2)
+    
+    # Utwórz macierz
     matrix = [[0 for _ in range(num_vertices + 4)] for _ in range(num_vertices)]
+    
+    # Wypełnij główną część macierzy
     for i in range(num_vertices):
+        vi = i + 1
         for j in range(num_vertices):
-            vi = i + 1
             vj = j + 1
-            is_successor = vj in successors[vi]
-            is_predecessor = vi in successors[vj]
-            is_cycle = vj in cycles[vi]
-            if is_cycle:
-                pass
-            elif is_successor and is_predecessor:
+            if vj in cycles[vi]:
+                continue
+            elif vj in successors[vi] and vi in successors[vj]:
                 matrix[i][j] = 2
-            elif is_successor:
+            elif vj in successors[vi]:
                 matrix[i][j] = 5
-            elif is_predecessor:
+            elif vi in successors[vj]:
                 matrix[i][j] = 3
             else:
                 matrix[i][j] = -1
+    
+    # Wypełnij informacje o następnikach
     for i in range(num_vertices):
         vi = i + 1
         if successors[vi]:
@@ -108,6 +100,8 @@ def create_graph_matrix(adj_list):
                         matrix[i][j] = successors[vi][idx + 1]
                     else:
                         matrix[i][j] = successors[vi][-1]
+    
+    # Wypełnij informacje o poprzednikach
     for i in range(num_vertices):
         vi = i + 1
         if predecessors[vi]:
@@ -121,6 +115,8 @@ def create_graph_matrix(adj_list):
                     else:
                         next_pred = predecessors[vi][-1]
                     matrix[i][j] = next_pred + num_vertices
+    
+    # Wypełnij informacje o niepołączonych wierzchołkach
     for i in range(num_vertices):
         vi = i + 1
         if non_incident[vi]:
@@ -134,6 +130,8 @@ def create_graph_matrix(adj_list):
                     else:
                         next_non = non_incident[vi][-1]
                     matrix[i][j] = -next_non
+    
+    # Wypełnij informacje o cyklach
     for i in range(num_vertices):
         vi = i + 1
         if cycles[vi]:
@@ -147,4 +145,5 @@ def create_graph_matrix(adj_list):
                     else:
                         next_cycle = cycles[vi][-1]
                     matrix[i][j] = next_cycle + 2 * num_vertices
+    
     return matrix
