@@ -10,9 +10,6 @@ from .graph import Graph
 
 
 class ButtonsBar:
-    """
-    controls all buttons on the top
-    """
 
     def __init__(self):
         self.color = Colors.DARK_GREY
@@ -26,8 +23,6 @@ class ButtonsBar:
             Button("ADD NODE", 15, (10, 105, 150, 40), Colors.BLUE, Colors.DARK_BLUE),
             Button("ADD EDGE", 15, (170, 105, 150, 40), Colors.BLUE, Colors.DARK_BLUE),
             Button("UNWEIGHTED", 15, (170, 55, 150, 40), Colors.RED, Colors.DARK_RED),
-
-            # Nowe przyciski algorytmów
             Button("HAMILTON CYCLE", 12, (350, 35, 150, 40), Colors.GREEN, Colors.DARK_GREEN),
             Button("EULER CYCLE", 15, (350, 85, 150, 40), Colors.GREEN, Colors.DARK_GREEN),
         ]
@@ -43,12 +38,7 @@ class ButtonsBar:
                 return button
 
     def update_algo_buttons_state(self, graph: Graph):
-        """
-        changes buttons state if they are available or not
-        :param graph: graph object
-        """
-        # Wszystkie algorytmy cykli są dostępne dla każdego typu grafu
-        # Algorytmy same sprawdzają czy dany typ grafu obsługuje dany cykl
+
         for button in self.buttons:
             if button.text in ["HAMILTON CYCLE", "EULER CYCLE"]:
                 if len(graph.vertex_dict) > 0:
@@ -85,10 +75,6 @@ class ButtonsBar:
 
     @staticmethod
     def choose_file_dialog() -> str:
-        """
-        pops file window
-        :return: full choosen file path
-        """
         t = tkinter.Tk()
         t.withdraw()
         file_path = tkinter.filedialog.askopenfilename(parent=t)

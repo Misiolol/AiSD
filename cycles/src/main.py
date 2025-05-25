@@ -85,7 +85,6 @@ def main():
                 if clicked_button.text == "ADD EDGE":
                     graph.adding_edge = True
 
-                # Nowe algorytmy cykli
                 if len(graph.vertex_dict) > 0:
                     if clicked_button.text == "HAMILTON CYCLE":
                         hamilton = HamiltonCycleVis(graph)
